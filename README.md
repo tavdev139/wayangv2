@@ -67,3 +67,4 @@ Tips pivot: lengan atas boleh punya `prox` sedikit di luar tepi atas gambar (mis
 ## Berkas bantu
 
 `png_*.py`, `probe_*.py`, `build_arjuna.py`, `arjuna_geom.py`, dll. adalah skrip sekali pakai untuk memotong/membersihkan gambar Arjuna (path-nya masih Windows). Yang dipakai saat menambah karakter hanya `measure_pieces.py`.
+"# wayangv2" 
