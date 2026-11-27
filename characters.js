@@ -120,17 +120,19 @@ const DEWI_SINTA_ARMS = {
   },
 };
 
-// Semar: pivots are measured from the rivet holes in the user's cut-parts photo.
+// Semar: arm pieces cut from the user's photo of the leather parts (two straps for the upper arms, two for the forearms,
+// two hands with gold wrist rings). Each piece was rotated so shoulder->elbow->wrist->fingertip hangs straight down, and the
+// pivots are the centres of the rivet holes. The photo is bigger than the body, so armPartScale (in the entry below) shrinks it.
 const SEMAR_ARMS = {
   L: {
-    upper: { src: 'assets/upper-arm-semar-l.png', size: [161, 218], prox: [142.1, 17.7], dist: [40, 196.3] },
-    fore: { src: 'assets/forearm-semar-l.png', size: [60, 233], prox: [29.7, 19.7], dist: [31.3, 224.6] },
-    hand: { src: 'assets/hand-semar-l.png', size: [139, 159], prox: [68.6, 25.2], grip: [66.8, 83.8] },
+    upper: { src: 'assets/upper-arm-semar-l.png', size: [79, 467], prox: [40.1, 39.3], dist: [40.1, 425.1] },
+    fore: { src: 'assets/forearm-semar-l.png', size: [80, 525], prox: [41.3, 37.8], dist: [41.3, 484.4] },
+    hand: { src: 'assets/hand-semar-l.png', size: [132, 308], prox: [58.8, 24.1], grip: [58.8, 302.6] },
   },
   R: {
-    upper: { src: 'assets/upper-arm-semar-r.png', size: [180, 66], prox: [14.4, 36.8], dist: [165, 28.1] },
-    fore: { src: 'assets/forearm-semar-r.png', size: [151, 174], prox: [138, 170], dist: [76.8, 53.9] },
-    hand: { src: 'assets/hand-semar-r.png', size: [104, 116], prox: [15.6, 106.9], grip: [89.7, 13] },
+    upper: { src: 'assets/upper-arm-semar-r.png', size: [78, 470], prox: [40.9, 39.1], dist: [40.9, 429.2] },
+    fore: { src: 'assets/forearm-semar-r.png', size: [81, 526], prox: [40.3, 40.9], dist: [40.3, 488.5] },
+    hand: { src: 'assets/hand-semar-r.png', size: [131, 308], prox: [72.3, 23.6], grip: [72.3, 302.3] },
   },
 };
 
@@ -322,6 +324,7 @@ const RAW = [
       ties: [350, 660, 820],
     },
     arms: SEMAR_ARMS,
+    armPartScale: { upper: 0.45, fore: 0.45, hand: 0.42 },
     armDamping: 1.5,
     jointDamping: 2.8,
     armReach: { min: 0.4, max: 0.96 },

@@ -227,11 +227,26 @@ resize();
 const intro = $('intro');
 const introStatus = $('intro-status');
 const startBtn = $('start-camera');
+const startMenu = $('start-menu');
+const startHelp = $('start-help');
+const startHelpToggle = $('start-help-toggle');
+const startHelpLabel = $('start-help-label');
 const statusPill = $('status');
 const statusText = $('status-text');
 let showPreview = true;
+let isRecording = false;
+let quizReturnFocus = null;
+let storyReturnFocus = null;
 
 async function startCamera(showProgress = false) {
+  // Returning to the main menu after a story keeps the camera running; reuse that stream.
+  if (controller.source === 'camera' && tracker.ready && video.srcObject) {
+    introStatus.textContent = '';
+    intro.classList.add('gone');
+    showChromeForActivity();
+    syncPreview();
+    return true;
+  }
   startBtn.disabled = true;
   introStatus.classList.remove('err');
   try {
@@ -273,6 +288,34 @@ $('use-mouse').addEventListener('click', () => {
   intro.classList.add('gone');
   showChromeForActivity();
 });
+
+// Game-style keyboard navigation for the main menu.
+startMenu.addEventListener('keydown', (event) => {
+  if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+  const items = [...startMenu.querySelectorAll('button:not(:disabled)')];
+  if (!items.length) return;
+  event.preventDefault();
+  const current = items.indexOf(document.activeElement);
+  let next = current;
+  if (event.key === 'Home') next = 0;
+  else if (event.key === 'End') next = items.length - 1;
+  else if (event.key === 'ArrowDown') next = current < 0 ? 0 : (current + 1) % items.length;
+  else next = current < 0 ? items.length - 1 : (current - 1 + items.length) % items.length;
+  items[next].focus();
+});
+
+function syncStartHelpLabel() {
+  startHelpLabel.textContent = t(startHelp.hidden ? 'start.help' : 'start.help.close');
+}
+
+startHelpToggle.addEventListener('click', () => {
+  const open = startHelp.hidden;
+  startHelp.hidden = !open;
+  startHelpToggle.setAttribute('aria-expanded', String(open));
+  syncStartHelpLabel();
+});
+$('start-settings').addEventListener('click', () => settingsToggle.click());
+
 $('home-toggle').addEventListener('click', () => {
   window.location.reload();
 });
@@ -332,6 +375,7 @@ const STORY_NARRATION_MUSIC_DUCK_SECONDS = 0.25;
 function showChromeForActivity() {
   clearTimeout(chromeHideTimer);
   document.body.classList.remove('chrome-hidden');
+  if (isRecording) return;
   if (!storyState && controller.source !== 'camera') return;
 
   chromeHideTimer = setTimeout(() => {
@@ -466,7 +510,11 @@ function closeQuiz() {
   quizModal.hidden = true;
   activeStoryQuiz = null;
   activeStoryQuizStory = null;
-  menuToggle.focus();
+  const target = !intro.classList.contains('gone') && quizReturnFocus?.isConnected
+    ? quizReturnFocus
+    : menuToggle;
+  quizReturnFocus = null;
+  target.focus();
 }
 
 function storyLineAt(story, index) {
@@ -864,7 +912,7 @@ async function startStory(story) {
   $('story-play-toggle').focus();
 }
 
-function stopStory() {
+function stopStory(restoreFocus = true) {
   const state = storyState;
   if (!state || state.stopping) return;
   state.stopping = true;
@@ -907,13 +955,25 @@ function stopStory() {
   intro.classList.toggle('gone', !saved.introVisible);
   storyPlayback.hidden = true;
   showChromeForActivity();
-  $('open-stories').focus();
+  const introVisible = !intro.classList.contains('gone');
+  const target = introVisible && storyReturnFocus?.isConnected
+    ? storyReturnFocus
+    : introVisible ? $('open-stories') : menuToggle;
+  storyReturnFocus = null;
+  if (restoreFocus) {
+    // Let the start screen become visible again before moving focus back into it.
+    requestAnimationFrame(() => {
+      if (!storyState) target.focus();
+    });
+  }
 }
 
 function finishStoryAndLaunchQuiz() {
   const story = storyState?.story;
-  stopStory();
+  const returnFocus = storyReturnFocus;
+  stopStory(false);
   if (!story?.quiz?.length) return;
+  quizReturnFocus = returnFocus;
   quizModal.hidden = false;
   startQuiz(story.quiz, story);
   $('quiz-close').focus();
@@ -995,27 +1055,36 @@ menuToggle.addEventListener('click', () => {
 document.addEventListener('pointerdown', (e) => {
   if (!appMenu.hidden && !appMenu.contains(e.target) && !menuToggle.contains(e.target)) closeAppMenu();
 });
-$('open-quiz').addEventListener('click', () => {
+function openQuiz(trigger = document.activeElement) {
+  quizReturnFocus = trigger;
   closeAppMenu();
   quizModal.hidden = false;
   startQuiz();
   $('quiz-close').focus();
-});
-$('open-stories').addEventListener('click', () => {
+}
+function openStories(trigger = document.activeElement) {
+  storyReturnFocus = trigger;
   closeAppMenu();
   renderStoryList();
   storyModal.hidden = false;
   storyList.querySelector('button')?.focus();
-});
-$('story-close').addEventListener('click', () => {
+}
+function closeStoryPicker() {
   storyModal.hidden = true;
-  $('open-stories').focus();
-});
+  const introVisible = !intro.classList.contains('gone');
+  const target = introVisible && storyReturnFocus?.isConnected
+    ? storyReturnFocus
+    : introVisible ? $('open-stories') : menuToggle;
+  storyReturnFocus = null;
+  target.focus();
+}
+$('open-quiz').addEventListener('click', (event) => openQuiz(event.currentTarget));
+$('open-stories').addEventListener('click', (event) => openStories(event.currentTarget));
+$('start-quiz').addEventListener('click', (event) => openQuiz(event.currentTarget));
+$('start-stories').addEventListener('click', (event) => openStories(event.currentTarget));
+$('story-close').addEventListener('click', closeStoryPicker);
 storyModal.addEventListener('click', (e) => {
-  if (e.target === storyModal) {
-    storyModal.hidden = true;
-    $('open-stories').focus();
-  }
+  if (e.target === storyModal) closeStoryPicker();
 });
 $('story-prev').addEventListener('click', () => {
   if (!storyState || storyState.stopping || storyState.lineIndex === 0) return;
@@ -1337,6 +1406,8 @@ document.addEventListener('app-language-change', () => {
   refreshLocalizedOptions();
   syncPreview();
   syncSoundUi();
+  syncStartHelpLabel();
+  syncStageTools();
   updateHud();
   if (!quizModal.hidden) {
     $('quiz-title').textContent = activeStoryQuiz
@@ -1408,8 +1479,7 @@ addEventListener('keydown', (e) => {
       return;
     }
     if (!storyModal.hidden) {
-      storyModal.hidden = true;
-      $('open-stories').focus();
+      closeStoryPicker();
       return;
     }
     if (!quizModal.hidden) {
@@ -1418,6 +1488,28 @@ addEventListener('keydown', (e) => {
     }
     if (!appMenu.hidden) {
       closeAppMenu();
+      return;
+    }
+  }
+  const typing = e.target instanceof HTMLInputElement ||
+    e.target instanceof HTMLSelectElement ||
+    e.target instanceof HTMLTextAreaElement ||
+    e.target?.isContentEditable;
+  if (!typing && !e.ctrlKey && !e.metaKey && !e.altKey && quizModal.hidden && storyModal.hidden) {
+    const stageKey = e.key.toLowerCase();
+    if (e.shiftKey && stageKey === 'f') {
+      e.preventDefault();
+      toggleFullscreen();
+      return;
+    }
+    if (!e.shiftKey && stageKey === 's') {
+      e.preventDefault();
+      takeStageScreenshot();
+      return;
+    }
+    if (!e.shiftKey && stageKey === 'r') {
+      e.preventDefault();
+      toggleStageRecording();
       return;
     }
   }
@@ -1445,6 +1537,281 @@ function showToast(text) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toast.classList.remove('show'), 2600);
 }
+
+// ---------- stage tools: screenshot / record / fullscreen ----------
+const stageScreenshotBtn = $('stage-screenshot');
+const stageRecordBtn = $('stage-record');
+const stageFullscreenBtn = $('stage-fullscreen');
+const recordingChip = $('recording-chip');
+const recordingTime = $('recording-time');
+const screenshotFlash = $('screenshot-flash');
+let mediaRecorder = null;
+let recordingStream = null;
+let recordingChunks = [];
+let recordingStartedAt = 0;
+let recordingTimer = 0;
+let recordingAudioDestination = null;
+let recordingShouldSave = true;
+let recordingAudioContext = null;
+const recordingAudioSources = [];
+
+function stageFileName(extension) {
+  const date = new Date();
+  const pad = (value) => String(value).padStart(2, '0');
+  const stamp = `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}-${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}`;
+  return `wayang-${stamp}.${extension}`;
+}
+
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  link.rel = 'noopener';
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+}
+
+function flashScreenshot() {
+  screenshotFlash.classList.remove('flash');
+  void screenshotFlash.offsetWidth;
+  screenshotFlash.classList.add('flash');
+  setTimeout(() => screenshotFlash.classList.remove('flash'), 500);
+}
+
+function takeStageScreenshot() {
+  if (!window.wayang.lastFrame) return;
+  try {
+    // WebGL clears its drawing buffer after compositing, so draw one fresh frame right before reading it.
+    renderer.render(window.wayang.lastFrame);
+  } catch (err) {
+    console.error('Screenshot render failed', err);
+  }
+  flashScreenshot();
+  canvas.toBlob((blob) => {
+    if (!blob) {
+      showToast(t('stage.screenshot.error'));
+      return;
+    }
+    downloadBlob(blob, stageFileName('png'));
+    showToast(t('stage.screenshot.saved'));
+  }, 'image/png');
+}
+
+function getRecordingAudioContext() {
+  if (recordingAudioContext) return recordingAudioContext;
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) return null;
+  try {
+    recordingAudioContext = new AudioContextClass();
+    for (const element of [music.el, storyAudio]) {
+      try {
+        const source = recordingAudioContext.createMediaElementSource(element);
+        source.connect(recordingAudioContext.destination);
+        recordingAudioSources.push(source);
+      } catch (err) {
+        console.warn('Audio capture is unavailable for one source', err);
+      }
+    }
+    recordingAudioContext.resume().catch(() => {});
+    return recordingAudioContext;
+  } catch (err) {
+    console.warn('Audio capture is unavailable', err);
+    recordingAudioContext = null;
+    return null;
+  }
+}
+
+function connectRecordingAudio() {
+  const context = getRecordingAudioContext();
+  if (!context || !recordingAudioSources.length) return null;
+  try {
+    const destination = context.createMediaStreamDestination();
+    for (const source of recordingAudioSources) source.connect(destination);
+    context.resume().catch(() => {});
+    return destination;
+  } catch (err) {
+    console.warn('Recording audio could not be mixed', err);
+    return null;
+  }
+}
+
+function disconnectRecordingAudio() {
+  if (!recordingAudioDestination) return;
+  for (const source of recordingAudioSources) {
+    try {
+      source.disconnect(recordingAudioDestination);
+    } catch {
+      /* source was already disconnected */
+    }
+  }
+  recordingAudioDestination.stream.getTracks().forEach((track) => track.stop());
+  recordingAudioDestination = null;
+}
+
+function syncStageTools() {
+  const fullscreen = Boolean(document.fullscreenElement);
+  stageRecordBtn.setAttribute('aria-pressed', String(isRecording));
+  stageRecordBtn.setAttribute('aria-label', t(isRecording ? 'stage.record.stop' : 'stage.record'));
+  stageRecordBtn.title = t(isRecording ? 'stage.record.stop.title' : 'stage.record.title');
+  stageFullscreenBtn.setAttribute('aria-pressed', String(fullscreen));
+  stageFullscreenBtn.setAttribute('aria-label', t(fullscreen ? 'stage.fullscreen.exit' : 'stage.fullscreen'));
+  stageFullscreenBtn.title = t(fullscreen ? 'stage.fullscreen.exit.title' : 'stage.fullscreen.title');
+  recordingChip.hidden = !isRecording;
+}
+
+function updateRecordingTime() {
+  if (!isRecording) return;
+  const total = Math.max(0, Math.floor((performance.now() - recordingStartedAt) / 1000));
+  const hours = Math.floor(total / 3600);
+  const minutes = Math.floor((total % 3600) / 60);
+  const seconds = total % 60;
+  const pad = (value) => String(value).padStart(2, '0');
+  recordingTime.textContent = hours > 0
+    ? `${hours}:${pad(minutes)}:${pad(seconds)}`
+    : `${pad(minutes)}:${pad(seconds)}`;
+}
+
+function pickRecordingMimeType() {
+  const types = [
+    'video/webm;codecs=vp9,opus',
+    'video/webm;codecs=vp8,opus',
+    'video/webm;codecs=vp9',
+    'video/webm;codecs=vp8',
+    'video/webm',
+    'video/mp4',
+  ];
+  return types.find((type) => window.MediaRecorder?.isTypeSupported?.(type)) || '';
+}
+
+function resetRecordingUi() {
+  isRecording = false;
+  clearInterval(recordingTimer);
+  recordingTimer = 0;
+  syncStageTools();
+  showChromeForActivity();
+}
+
+function startStageRecording() {
+  if (isRecording) return;
+  if (!window.MediaRecorder || !canvas.captureStream) {
+    showToast(t('stage.record.unsupported'));
+    return;
+  }
+  let stream;
+  try {
+    stream = canvas.captureStream(30);
+  } catch (err) {
+    console.error('Canvas capture failed', err);
+    showToast(t('stage.record.unsupported'));
+    return;
+  }
+  recordingAudioDestination = connectRecordingAudio();
+  if (recordingAudioDestination) {
+    stream = new MediaStream([
+      ...stream.getVideoTracks(),
+      ...recordingAudioDestination.stream.getAudioTracks(),
+    ]);
+  }
+  const mimeType = pickRecordingMimeType();
+  let recorder;
+  try {
+    recorder = new MediaRecorder(stream, {
+      ...(mimeType ? { mimeType } : {}),
+      videoBitsPerSecond: 8_000_000,
+    });
+  } catch (err) {
+    console.error('MediaRecorder could not start', err);
+    stream.getTracks().forEach((track) => track.stop());
+    disconnectRecordingAudio();
+    showToast(t('stage.record.error'));
+    return;
+  }
+  mediaRecorder = recorder;
+  recordingStream = stream;
+  recordingChunks = [];
+  recordingShouldSave = true;
+  recorder.addEventListener('dataavailable', (event) => {
+    if (event.data?.size) recordingChunks.push(event.data);
+  });
+  recorder.addEventListener('error', (event) => {
+    console.error('Recording failed', event.error || event);
+    recordingShouldSave = false;
+    if (recorder.state !== 'inactive') recorder.stop();
+    showToast(t('stage.record.error'));
+  });
+  recorder.addEventListener('stop', () => {
+    const type = recorder.mimeType || 'video/webm';
+    const blob = new Blob(recordingChunks, { type });
+    const shouldSave = recordingShouldSave;
+    recordingChunks = [];
+    if (mediaRecorder === recorder) mediaRecorder = null;
+    recordingStream?.getTracks().forEach((track) => track.stop());
+    recordingStream = null;
+    disconnectRecordingAudio();
+    resetRecordingUi();
+    if (shouldSave && blob.size) {
+      downloadBlob(blob, stageFileName(type.includes('mp4') ? 'mp4' : 'webm'));
+      showToast(t('stage.record.saved'));
+    } else if (shouldSave) {
+      showToast(t('stage.record.error'));
+    }
+  });
+  try {
+    recorder.start(1000);
+  } catch (err) {
+    console.error('Recording could not start', err);
+    stream.getTracks().forEach((track) => track.stop());
+    disconnectRecordingAudio();
+    mediaRecorder = null;
+    recordingStream = null;
+    showToast(t('stage.record.error'));
+    return;
+  }
+  isRecording = true;
+  recordingStartedAt = performance.now();
+  updateRecordingTime();
+  recordingTimer = setInterval(updateRecordingTime, 250);
+  syncStageTools();
+  showChromeForActivity();
+  showToast(t('stage.record.started'));
+}
+
+function stopStageRecording(save = true) {
+  if (!mediaRecorder) return;
+  recordingShouldSave = save;
+  if (mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+}
+
+function toggleStageRecording() {
+  if (isRecording) stopStageRecording(true);
+  else startStageRecording();
+}
+
+async function toggleFullscreen() {
+  if (!document.fullscreenEnabled) {
+    showToast(t('stage.fullscreen.unsupported'));
+    return;
+  }
+  try {
+    if (document.fullscreenElement) await document.exitFullscreen();
+    else await document.documentElement.requestFullscreen();
+  } catch (err) {
+    console.warn('Fullscreen unavailable', err);
+    showToast(t('stage.fullscreen.unsupported'));
+  }
+}
+
+stageScreenshotBtn.addEventListener('click', takeStageScreenshot);
+stageRecordBtn.addEventListener('click', toggleStageRecording);
+stageFullscreenBtn.addEventListener('click', toggleFullscreen);
+document.addEventListener('fullscreenchange', syncStageTools);
+addEventListener('beforeunload', () => {
+  if (isRecording) stopStageRecording(false);
+});
+syncStageTools();
 
 function updateHud() {
   const { source, status } = controller;
