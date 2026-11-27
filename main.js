@@ -1,6 +1,6 @@
 import { Renderer, STAGE_W, STAGE_H } from './renderer.js';
 import { Puppet } from './rig.js';
-import { CHARACTERS, CHARACTER_LIST, DEFAULT_CHARACTER, DEFAULT_PAIR, characterTextures } from './characters.js';
+import { CHARACTERS, CHARACTER_LIST, CHARACTER_LORE, DEFAULT_CHARACTER, DEFAULT_PAIR, characterTextures } from './characters.js';
 import { HandTracker } from './tracking.js';
 import { Controller } from './controller.js';
 import { BackgroundMusic, BeatClock } from './audio.js';
@@ -175,6 +175,8 @@ try {
 // Which figure each puppet plays comes from characters.js; pick them in Settings, or with ?left=arjuna&right=wayang-baru.
 const tracker = new HandTracker(video);
 const controller = new Controller(tracker);
+const reducedMotionPreference = matchMedia('(prefers-reduced-motion: reduce)');
+controller.demoPaused = reducedMotionPreference.matches;
 let facingMode = 'target';
 const params = new URLSearchParams(location.search);
 const pick = (name, i) => [params.get(name), DEFAULT_PAIR[i], DEFAULT_CHARACTER].find((id) => CHARACTERS[id]);
@@ -231,12 +233,15 @@ const startMenu = $('start-menu');
 const startHelp = $('start-help');
 const startHelpToggle = $('start-help-toggle');
 const startHelpLabel = $('start-help-label');
+const startMotionToggle = $('start-motion-toggle');
+const startMotionLabel = $('start-motion-label');
 const statusPill = $('status');
 const statusText = $('status-text');
 let showPreview = true;
 let isRecording = false;
 let quizReturnFocus = null;
 let storyReturnFocus = null;
+let practiceOpenedFromStart = false;
 
 async function startCamera(showProgress = false) {
   // Returning to the main menu after a story keeps the camera running; reuse that stream.
@@ -308,12 +313,27 @@ function syncStartHelpLabel() {
   startHelpLabel.textContent = t(startHelp.hidden ? 'start.help' : 'start.help.close');
 }
 
+function syncStartMotionLabel() {
+  const key = controller.demoPaused ? 'start.motion.resume' : 'start.motion.pause';
+  startMotionLabel.textContent = t(key);
+  startMotionToggle.dataset.paused = String(controller.demoPaused);
+}
+
 startHelpToggle.addEventListener('click', () => {
   const open = startHelp.hidden;
   startHelp.hidden = !open;
   startHelpToggle.setAttribute('aria-expanded', String(open));
   syncStartHelpLabel();
 });
+startMotionToggle.addEventListener('click', () => {
+  controller.demoPaused = !controller.demoPaused;
+  syncStartMotionLabel();
+});
+reducedMotionPreference.addEventListener('change', (event) => {
+  controller.demoPaused = event.matches;
+  syncStartMotionLabel();
+});
+syncStartMotionLabel();
 $('start-settings').addEventListener('click', () => settingsToggle.click());
 
 $('home-toggle').addEventListener('click', () => {
@@ -343,6 +363,10 @@ const menuToggle = $('menu-toggle');
 const appMenu = $('app-menu');
 const quizModal = $('quiz-modal');
 const storyModal = $('story-modal');
+const characterGalleryModal = $('character-gallery-modal');
+const characterGalleryGrid = $('character-gallery-grid');
+const practiceModal = $('practice-modal');
+const practiceCoach = $('practice-coach');
 const storyList = $('story-list');
 const storyPlayback = $('story-playback');
 const storyCaption = $('story-caption');
@@ -363,6 +387,7 @@ let quizSelectedOptionIndex = -1;
 let activeStoryQuiz = null;
 let activeStoryQuizStory = null;
 let storyState = null;
+let practiceState = null;
 const storyAudio = $('story-narration');
 storyAudio.preload = 'auto';
 let storyAudioToken = 0;
@@ -383,7 +408,10 @@ function showChromeForActivity() {
       !settings.hidden ||
       !appMenu.hidden ||
       !quizModal.hidden ||
-      !storyModal.hidden;
+      !storyModal.hidden ||
+      characterGalleryModal.open ||
+      practiceModal.open ||
+      practiceState;
     if (!overlayOpen) document.body.classList.add('chrome-hidden');
   }, CHROME_HIDE_DELAY);
 }
@@ -948,6 +976,7 @@ function stopStory(restoreFocus = true) {
   $('opt-characters').value = saved.settingsCharacters;
   $('opt-char-left').value = saved.characters[0];
   $('opt-char-right').value = saved.characters[1];
+  syncPuppetPreviews();
   $('opt-facing').value = facingMode;
   applyFacing();
   backgroundInput.value = saved.background;
@@ -1078,11 +1107,137 @@ function closeStoryPicker() {
   storyReturnFocus = null;
   target.focus();
 }
+function renderCharacterGallery() {
+  characterGalleryGrid.replaceChildren();
+  for (const character of CHARACTER_LIST) {
+    const card = document.createElement('article');
+    card.className = 'character-gallery-card';
+    card.setAttribute('role', 'listitem');
+    const portrait = document.createElement('img');
+    portrait.src = character.body.src;
+    portrait.alt = t('gallery.portrait', { name: character.name });
+    const name = document.createElement('h3');
+    name.textContent = character.name;
+    const summary = document.createElement('p');
+    const lore = CHARACTER_LORE[character.id];
+    summary.textContent = getLanguage() === 'en' ? lore.en : lore.id;
+    card.append(portrait, name, summary);
+    characterGalleryGrid.append(card);
+  }
+}
+function openCharacterGallery() {
+  renderCharacterGallery();
+  characterGalleryModal.showModal();
+  $('character-gallery-close').focus();
+}
+function closeCharacterGallery() {
+  if (characterGalleryModal.open) characterGalleryModal.close();
+}
+const practiceStepKeys = {
+  camera: ['practice.camera.move', 'practice.camera.arms', 'practice.camera.dance'],
+  mouse: ['practice.mouse.move', 'practice.mouse.depth', 'practice.mouse.actions'],
+};
+function renderPracticeStep() {
+  if (!practiceState) return;
+  const { mode, index } = practiceState;
+  const total = practiceStepKeys[mode].length;
+  $('practice-step-count').textContent = t('practice.step', { current: index + 1, total });
+  const values = mode === 'camera' && index === 1
+    ? { fingers: t(`settings.fingers.${$('opt-fingers').value}`) }
+    : {};
+  $('practice-step-description').textContent = t(practiceStepKeys[mode][index], values);
+  $('practice-prev').disabled = index === 0;
+  $('practice-next').textContent = t(index === total - 1 ? 'practice.finish' : 'practice.next');
+}
+function openGesturePractice() {
+  practiceOpenedFromStart = !intro.classList.contains('gone');
+  practiceModal.showModal();
+  $('practice-camera').focus();
+}
+function closePracticePicker() {
+  if (practiceModal.open) practiceModal.close();
+}
+function beginPractice(mode, previousSource = controller.source, returnToStart = practiceOpenedFromStart) {
+  practiceState = { mode, index: 0, previousSource, returnToStart };
+  intro.classList.add('gone');
+  showChromeForActivity();
+  closeAppMenu();
+  practiceModal.close();
+  practiceCoach.hidden = false;
+  renderPracticeStep();
+  $('practice-next').focus();
+}
+async function beginCameraPractice() {
+  const button = $('practice-camera');
+  const previousSource = controller.source;
+  const returnToStart = practiceOpenedFromStart;
+  button.disabled = true;
+  try {
+    if (await startCamera(true)) beginPractice('camera', previousSource, returnToStart);
+  } finally {
+    button.disabled = false;
+  }
+}
+function endPractice(completed = false) {
+  if (!practiceState) return;
+  const { previousSource, returnToStart } = practiceState;
+  controller.source = previousSource;
+  practiceState = null;
+  practiceCoach.hidden = true;
+  if (returnToStart) intro.classList.remove('gone');
+  practiceOpenedFromStart = false;
+  if (completed) showToast(t('practice.done'));
+  (returnToStart ? $('start-gesture-practice') : menuToggle).focus();
+}
 $('open-quiz').addEventListener('click', (event) => openQuiz(event.currentTarget));
 $('open-stories').addEventListener('click', (event) => openStories(event.currentTarget));
+$('open-character-gallery').addEventListener('click', (event) => openCharacterGallery(event.currentTarget));
+$('open-gesture-practice').addEventListener('click', (event) => openGesturePractice(event.currentTarget));
 $('start-quiz').addEventListener('click', (event) => openQuiz(event.currentTarget));
 $('start-stories').addEventListener('click', (event) => openStories(event.currentTarget));
+$('start-character-gallery').addEventListener('click', () => openCharacterGallery());
+$('start-gesture-practice').addEventListener('click', () => openGesturePractice());
 $('story-close').addEventListener('click', closeStoryPicker);
+$('character-gallery-close').addEventListener('click', closeCharacterGallery);
+$('practice-close').addEventListener('click', closePracticePicker);
+if (!('closedBy' in HTMLDialogElement.prototype)) {
+  const isBackdropPoint = (event, dialog) => {
+    const rect = dialog.getBoundingClientRect();
+    return event.clientX < rect.left || event.clientX > rect.right ||
+      event.clientY < rect.top || event.clientY > rect.bottom;
+  };
+  for (const dialog of [characterGalleryModal, practiceModal]) {
+    let pressedOutside = false;
+    dialog.addEventListener('pointerdown', (event) => {
+      pressedOutside = isBackdropPoint(event, dialog);
+    });
+    dialog.addEventListener('pointerup', (event) => {
+      if (pressedOutside && isBackdropPoint(event, dialog) && dialog.open) dialog.close();
+      pressedOutside = false;
+    });
+  }
+}
+$('practice-camera').addEventListener('click', beginCameraPractice);
+$('practice-mouse').addEventListener('click', () => {
+  const previousSource = controller.source;
+  controller.source = 'mouse';
+  beginPractice('mouse', previousSource, practiceOpenedFromStart);
+});
+$('practice-prev').addEventListener('click', () => {
+  if (!practiceState || practiceState.index === 0) return;
+  practiceState.index--;
+  renderPracticeStep();
+});
+$('practice-next').addEventListener('click', () => {
+  if (!practiceState) return;
+  if (practiceState.index === practiceStepKeys[practiceState.mode].length - 1) {
+    endPractice(true);
+    return;
+  }
+  practiceState.index++;
+  renderPracticeStep();
+});
+$('practice-exit').addEventListener('click', () => endPractice(false));
 storyModal.addEventListener('click', (e) => {
   if (e.target === storyModal) closeStoryPicker();
 });
@@ -1164,6 +1319,11 @@ settingsToggle.addEventListener('click', () => {
   settings.hidden = !settings.hidden;
   settingsToggle.setAttribute('aria-expanded', String(!settings.hidden));
 });
+$('settings-close').addEventListener('click', () => {
+  settings.hidden = true;
+  settingsToggle.setAttribute('aria-expanded', 'false');
+  settingsToggle.focus();
+});
 languageToggle.addEventListener('click', () => {
   const open = languageMenu.hidden;
   languageMenu.hidden = !open;
@@ -1186,19 +1346,36 @@ document.addEventListener('pointerdown', (event) => {
 });
 $('opt-fingers').addEventListener('change', (e) => (controller.settings.fingers = e.target.value));
 $('opt-bodyhand').addEventListener('change', (e) => (controller.settings.bodyHand = e.target.value));
+function syncPuppetPreviews() {
+  const selected = [$('opt-char-left').value, $('opt-char-right').value];
+  selected.forEach((id, index) => {
+    const character = CHARACTERS[id];
+    const side = index === 0 ? 'left' : 'right';
+    const image = $(`${side}-puppet-preview-image`);
+    image.src = character.body.src;
+    image.alt = '';
+    $(`${side}-puppet-preview-name`).textContent = character.name;
+  });
+  $('right-puppet-preview').hidden = controller.settings.characters !== 'two';
+}
 $('opt-characters').addEventListener('change', (e) => {
   controller.settings.characters = e.target.value;
   $('bodyhand-row').hidden = e.target.value === 'two';
   $('char-right-row').hidden = e.target.value !== 'two'; // one puppet = the left one
   applyFacing();
+  syncPuppetPreviews();
 });
 // one menu per puppet, filled from the registry, so a new character shows up here without touching the HTML
 [['opt-char-left', 0], ['opt-char-right', 1]].forEach(([id, i]) => {
   const select = $(id);
   for (const c of CHARACTER_LIST) select.add(new Option(c.name, c.id));
   select.value = puppets[i].char.id;
-  select.addEventListener('change', (e) => window.wayang.setCharacter(i, e.target.value));
+  select.addEventListener('change', (e) => {
+    window.wayang.setCharacter(i, e.target.value);
+    syncPuppetPreviews();
+  });
 });
+syncPuppetPreviews();
 $('opt-facing').addEventListener('change', (e) => {
   facingMode = e.target.value;
   applyFacing();
@@ -1208,6 +1385,19 @@ for (const background of BACKGROUNDS) backgroundInput.add(new Option(t(backgroun
 backgroundInput.value = BACKGROUNDS[0].key;
 backgroundInput.addEventListener('change', (e) => renderer.setBackground(e.target.value));
 $('opt-audience-view').addEventListener('change', (e) => renderer.setAudienceView(e.target.checked));
+$('opt-subtitle-size').addEventListener('input', syncSubtitleSettings);
+$('opt-subtitle-background').addEventListener('input', syncSubtitleSettings);
+function syncSubtitleSettings() {
+  const size = Number($('opt-subtitle-size').value);
+  const opacity = Number($('opt-subtitle-background').value);
+  $('opt-subtitle-size-output').value = `${size} px`;
+  $('opt-subtitle-size-output').textContent = `${size} px`;
+  $('opt-subtitle-background-output').value = `${opacity}%`;
+  $('opt-subtitle-background-output').textContent = `${opacity}%`;
+  storyCaption.style.setProperty('--subtitle-size', `${size}px`);
+  storyCaption.style.setProperty('--subtitle-background-opacity', String(opacity / 100));
+}
+syncSubtitleSettings();
 $('opt-camera').addEventListener('change', (e) => {
   showPreview = e.target.checked;
   syncPreview();
@@ -1407,6 +1597,7 @@ document.addEventListener('app-language-change', () => {
   syncPreview();
   syncSoundUi();
   syncStartHelpLabel();
+  syncStartMotionLabel();
   syncStageTools();
   updateHud();
   if (!quizModal.hidden) {
@@ -1425,6 +1616,8 @@ document.addEventListener('app-language-change', () => {
     }
   }
   if (!storyModal.hidden) renderStoryList();
+  if (characterGalleryModal.open) renderCharacterGallery();
+  if (practiceState) renderPracticeStep();
   if (storyState) renderStoryPlayback();
 });
 // autoplay with sound needs a user gesture: begin on the first click / tap / key
@@ -1474,12 +1667,17 @@ addEventListener('keydown', (e) => {
       setSoundMenuOpen(false, true);
       return;
     }
+    if (characterGalleryModal.open || practiceModal.open) return;
     if (storyState) {
       stopStory();
       return;
     }
     if (!storyModal.hidden) {
       closeStoryPicker();
+      return;
+    }
+    if (practiceState) {
+      endPractice(false);
       return;
     }
     if (!quizModal.hidden) {
@@ -1495,7 +1693,17 @@ addEventListener('keydown', (e) => {
     e.target instanceof HTMLSelectElement ||
     e.target instanceof HTMLTextAreaElement ||
     e.target?.isContentEditable;
-  if (!typing && !e.ctrlKey && !e.metaKey && !e.altKey && quizModal.hidden && storyModal.hidden) {
+  if (
+    !typing &&
+    !e.ctrlKey &&
+    !e.metaKey &&
+    !e.altKey &&
+    quizModal.hidden &&
+    storyModal.hidden &&
+    !characterGalleryModal.open &&
+    !practiceModal.open &&
+    !practiceState
+  ) {
     const stageKey = e.key.toLowerCase();
     if (e.shiftKey && stageKey === 'f') {
       e.preventDefault();
@@ -1513,7 +1721,7 @@ addEventListener('keydown', (e) => {
       return;
     }
   }
-  if (!quizModal.hidden || !storyModal.hidden || storyState) return;
+  if (!quizModal.hidden || !storyModal.hidden || characterGalleryModal.open || practiceModal.open || storyState) return;
   if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) return;
   const k = e.key.toLowerCase();
   if (k === 'f') turnPuppet(0);
@@ -1540,6 +1748,7 @@ function showToast(text) {
 
 // ---------- stage tools: screenshot / record / fullscreen ----------
 const stageScreenshotBtn = $('stage-screenshot');
+const stageTools = $('stage-tools');
 const stageRecordBtn = $('stage-record');
 const stageFullscreenBtn = $('stage-fullscreen');
 const recordingChip = $('recording-chip');
@@ -1654,13 +1863,21 @@ function disconnectRecordingAudio() {
 function syncStageTools() {
   const fullscreen = Boolean(document.fullscreenElement);
   stageRecordBtn.setAttribute('aria-pressed', String(isRecording));
-  stageRecordBtn.setAttribute('aria-label', t(isRecording ? 'stage.record.stop' : 'stage.record'));
+  stageRecordBtn.setAttribute('aria-label', t('stage.record'));
   stageRecordBtn.title = t(isRecording ? 'stage.record.stop.title' : 'stage.record.title');
   stageFullscreenBtn.setAttribute('aria-pressed', String(fullscreen));
-  stageFullscreenBtn.setAttribute('aria-label', t(fullscreen ? 'stage.fullscreen.exit' : 'stage.fullscreen'));
+  stageFullscreenBtn.setAttribute('aria-label', t('stage.fullscreen'));
   stageFullscreenBtn.title = t(fullscreen ? 'stage.fullscreen.exit.title' : 'stage.fullscreen.title');
   recordingChip.hidden = !isRecording;
 }
+
+function syncStageToolbarOrientation() {
+  const vertical = matchMedia('(max-width: 900px)').matches;
+  stageTools.setAttribute('aria-orientation', vertical ? 'vertical' : 'horizontal');
+  stageTools.setAttribute('focusgroup', vertical ? 'toolbar wrap block' : 'toolbar wrap');
+}
+syncStageToolbarOrientation();
+addEventListener('resize', syncStageToolbarOrientation, { passive: true });
 
 function updateRecordingTime() {
   if (!isRecording) return;
@@ -1808,6 +2025,44 @@ stageScreenshotBtn.addEventListener('click', takeStageScreenshot);
 stageRecordBtn.addEventListener('click', toggleStageRecording);
 stageFullscreenBtn.addEventListener('click', toggleFullscreen);
 document.addEventListener('fullscreenchange', syncStageTools);
+
+// Keep the toolbar to one Tab stop where native focusgroup is not available.
+if (!('focusGroup' in HTMLElement.prototype)) {
+  const toolbarButtons = [...stageTools.querySelectorAll('button:not([disabled])')];
+  toolbarButtons.forEach((button, index) => {
+    button.tabIndex = index === 0 ? 0 : -1;
+  });
+  stageTools.addEventListener('focusin', (event) => {
+    if (!toolbarButtons.includes(event.target)) return;
+    toolbarButtons.forEach((button) => {
+      button.tabIndex = button === event.target ? 0 : -1;
+    });
+  });
+  stageTools.addEventListener('keydown', (event) => {
+    const currentIndex = toolbarButtons.indexOf(document.activeElement);
+    if (currentIndex < 0) return;
+
+    const vertical = stageTools.getAttribute('aria-orientation') === 'vertical';
+    const rtl = getComputedStyle(stageTools).direction === 'rtl';
+    const step = vertical
+      ? { ArrowDown: 1, ArrowUp: -1 }
+      : { ArrowRight: rtl ? -1 : 1, ArrowLeft: rtl ? 1 : -1 };
+    let nextIndex;
+
+    if (Object.hasOwn(step, event.key)) {
+      nextIndex = (currentIndex + step[event.key] + toolbarButtons.length) % toolbarButtons.length;
+    } else if (event.key === 'Home') {
+      nextIndex = 0;
+    } else if (event.key === 'End') {
+      nextIndex = toolbarButtons.length - 1;
+    } else {
+      return;
+    }
+
+    event.preventDefault();
+    toolbarButtons[nextIndex].focus();
+  });
+}
 addEventListener('beforeunload', () => {
   if (isRecording) stopStageRecording(false);
 });
@@ -1968,7 +2223,13 @@ function tick(nowMs) {
   const dt = clamp(nowSeconds - last, 0, 1 / 15);
   last = nowSeconds;
 
-  const inputs = storyState ? advanceStory(dt, nowSeconds) : controller.update(nowSeconds, view);
+  const demoPaused = !storyState &&
+    !intro.classList.contains('gone') &&
+    controller.source === 'demo' &&
+    controller.demoPaused;
+  const inputs = storyState
+    ? advanceStory(dt, nowSeconds)
+    : demoPaused ? [] : controller.update(nowSeconds, view);
   const active = puppets.slice(0, storyState ? 2 : controller.puppetCount);
   // in "face each other" mode each character keeps its eyes on the other
   if (active.length === 2) {
@@ -1979,8 +2240,10 @@ function tick(nowMs) {
   const beat = beatClock.tick(dt);
   const steps = Math.max(1, Math.ceil(dt / PHYS_DT));
   const rhythm = { db: beat.db / steps, pos: beat.pos, period: beat.period };
-  for (let i = 0; i < steps; i++) {
-    active.forEach((p, j) => p.update(dt / steps, i === 0 ? inputs[j] ?? { active: false } : { ...(inputs[j] ?? { active: false }), danceTrigger: false }, view, rhythm));
+  if (!demoPaused) {
+    for (let i = 0; i < steps; i++) {
+      active.forEach((p, j) => p.update(dt / steps, i === 0 ? inputs[j] ?? { active: false } : { ...(inputs[j] ?? { active: false }), danceTrigger: false }, view, rhythm));
+    }
   }
   active.forEach((puppet) => {
     if (puppet.danceStarted) puppet.danceStarted = false;

@@ -2,7 +2,7 @@
 <html lang="id">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Wayang Kulit — Hand Puppetry</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -14,102 +14,122 @@
     <video id="video" playsinline muted></video>
 
     <section id="intro" class="start-screen">
-      <div class="start-inner">
-        <div class="start-brand">
-          <p class="eyebrow" data-i18n="intro.eyebrow">Panggung Interaktif</p>
-          <h1 class="start-title" data-i18n-html="intro.title">Wayang<br /><em>Kulit</em></h1>
-          <div class="start-ornament" aria-hidden="true"><span></span><i>✦</i><span></span></div>
-          <p class="lede" data-i18n="intro.lede">Pilih menu untuk memainkan wayang, menguji pengetahuan, atau menonton kisah klasik.</p>
+      <div class="start-card panel">
+        <div class="start-inner">
+          <div class="start-brand">
+            <p class="eyebrow" data-i18n="intro.eyebrow">Panggung Wayang Interaktif</p>
+            <h1 class="start-title" data-i18n-html="intro.title">Wayang<br /><em>Kulit</em></h1>
+            <div class="start-ornament" aria-hidden="true"><span></span><i>✦</i><span></span></div>
+            <p class="lede" data-i18n="intro.lede">Pilih cara bermain, kenali tokoh, lalu mulai pertunjukanmu.</p>
+          </div>
+
+          <button id="start-camera" class="start-enter" type="button">
+            <span data-i18n="intro.enter">Masuki Panggung</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13m-5-5 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <p class="start-enter-note" data-i18n="start.camera.desc">Kendalikan wayang dengan gerakan tangan di depan kamera.</p>
+
+          <nav id="start-menu" class="start-menu" aria-label="Pilihan aktivitas" data-i18n-aria-label="start.label">
+            <button id="use-mouse" class="start-option" type="button">
+              <span class="start-option-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M12 3a7 7 0 0 0-7 7v4a7 7 0 0 0 14 0v-4a7 7 0 0 0-7-7Zm0 0v7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              <span class="start-option-copy">
+                <span class="start-option-title" data-i18n="intro.mouse">Main dengan Mouse</span>
+                <span class="start-option-desc" data-i18n="start.mouse.desc">Main tanpa kamera, cukup gerakkan kursor di panggung.</span>
+              </span>
+              <svg class="start-option-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button id="start-quiz" class="start-option" type="button">
+              <span class="start-option-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9.6 9.2a2.6 2.6 0 1 1 3.6 2.4c-.8.4-1.2 1-1.2 1.9M12 17h.01" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </span>
+              <span class="start-option-copy">
+                <span class="start-option-title" data-i18n="menu.quiz.title">Kuis Tokoh Wayang</span>
+                <span class="start-option-desc" data-i18n="start.quiz.desc">Uji pengetahuanmu tentang tokoh wayang.</span>
+              </span>
+              <svg class="start-option-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button id="start-stories" class="start-option" type="button">
+              <span class="start-option-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M12 6.5C10.4 5.2 8.4 4.5 6 4.5H3v13h3c2.4 0 4.4.7 6 2 1.6-1.3 3.6-2 6-2h3v-13h-3c-2.4 0-4.4.7-6 2Zm0 0v13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+              </span>
+              <span class="start-option-copy">
+                <span class="start-option-title" data-i18n="menu.stories.title">Cerita Wayang</span>
+                <span class="start-option-desc" data-i18n="start.stories.desc">Tonton kisah wayang dengan narasi dan subtitle tersinkron.</span>
+              </span>
+              <svg class="start-option-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button id="start-character-gallery" class="start-option" type="button">
+              <span class="start-option-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5v-15Zm0 12A2.5 2.5 0 0 1 6.5 15H20M8 7h8M8 10h5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              <span class="start-option-copy">
+                <span class="start-option-title" data-i18n="gallery.open">Galeri tokoh</span>
+                <span class="start-option-desc" data-i18n="gallery.open-description">Kenali 13 tokoh wayang.</span>
+              </span>
+              <svg class="start-option-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button id="start-gesture-practice" class="start-option" type="button">
+              <span class="start-option-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M8 11V5a1.5 1.5 0 0 1 3 0v5-7a1.5 1.5 0 0 1 3 0v7-5a1.5 1.5 0 0 1 3 0v6-3a1.5 1.5 0 0 1 3 0v6c0 4-2.5 7-6.5 7h-1c-2.3 0-3.7-1-5-2.7l-3-4A1.7 1.7 0 0 1 7.2 12L8 13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              <span class="start-option-copy">
+                <span class="start-option-title" data-i18n="practice.open">Latihan gestur</span>
+                <span class="start-option-desc" data-i18n="practice.open-description">Coba gerakan kamera atau mouse.</span>
+              </span>
+              <svg class="start-option-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </nav>
+
+          <div class="start-highlights" aria-label="Fitur panggung" data-i18n-aria-label="start.feature.label">
+            <span data-i18n="start.feature.characters">13 Tokoh Wayang</span>
+            <span data-i18n="start.feature.capture">Foto &amp; rekam pentas</span>
+            <span data-i18n="start.feature.modes">Kamera atau mouse</span>
+          </div>
+
+          <button id="start-motion-toggle" class="start-motion-toggle" type="button" data-paused="false">
+            <svg class="motion-pause-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+            <svg class="motion-play-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 11 7-11 7V5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            <span id="start-motion-label" data-i18n="start.motion.pause">Jeda animasi</span>
+          </button>
+
+          <div class="start-footer">
+            <button id="start-settings" class="start-link" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19.4 13a7.6 7.6 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.3 7.3 0 0 0-1.7-1L15 3h-4l-.4 2.7a7.3 7.3 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.6 7.6 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a7.3 7.3 0 0 0 1.7 1L11 21h4l.4-2.7a7.3 7.3 0 0 0 1.7-1l2.5 1 2-3.5ZM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Z" transform="translate(-1 0)"/></svg>
+              <span data-i18n="settings.heading">Pengaturan</span>
+            </button>
+            <button id="start-help-toggle" class="start-link" type="button" aria-expanded="false" aria-controls="start-help">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9.6 9.2a2.6 2.6 0 1 1 3.6 2.4c-.8.4-1.2 1-1.2 1.9M12 17h.01" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              <span id="start-help-label" data-i18n="start.help">Cara bermain</span>
+            </button>
+          </div>
+
+          <div id="start-help" class="start-help" hidden>
+            <p class="howto-heading" data-i18n="intro.howto">Cara bermain</p>
+            <ul class="howto">
+              <li>
+                <span class="step-number" aria-hidden="true">01</span>
+                <span class="step-copy"><span class="k" data-i18n="intro.step.move">Gerakkan wayang</span><span class="howto-detail" data-i18n="intro.step.move.detail">Setiap tangan mengendalikan satu wayang. Gerakkan telapak untuk menggerakkan badan; miringkan untuk condong.</span></span>
+              </li>
+              <li>
+                <span class="step-number" aria-hidden="true">02</span>
+                <span class="step-copy"><span class="k" data-i18n="intro.step.arms">Gerakkan lengan</span><span class="howto-detail" data-i18n="intro.step.arms.detail">Gunakan ibu jari dan telunjuk untuk menggerakkan tongkat lengan.</span></span>
+              </li>
+              <li>
+                <span class="step-number" aria-hidden="true">03</span>
+                <span class="step-copy"><span class="k" data-i18n="intro.step.dance">Ajak menari</span><span class="howto-detail" data-i18n="intro.step.dance.detail">Angkat kelingking untuk kiprahan. Dekatkan tangan ke kamera agar bayangan membesar.</span></span>
+              </li>
+            </ul>
+          </div>
+
+          <p id="intro-status" class="status-line" role="status"></p>
         </div>
-
-        <nav id="start-menu" class="start-menu" aria-label="Menu utama" data-i18n-aria-label="start.label">
-          <button id="start-camera" class="start-item is-primary" type="button">
-            <span class="start-index" aria-hidden="true">01</span>
-            <span class="start-item-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M4 7h3l1.5-2h7L17 7h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1Zm8 9a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
-            </span>
-            <span class="start-item-copy">
-              <span class="start-item-title"><span data-i18n="intro.camera">Mulai dengan Kamera</span><span class="start-badge" data-i18n="start.recommended">Disarankan</span></span>
-              <span class="start-item-desc" data-i18n="start.camera.desc">Kendalikan wayang dengan gerakan tangan di depan kamera.</span>
-            </span>
-            <svg class="start-item-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
-
-          <button id="use-mouse" class="start-item" type="button">
-            <span class="start-index" aria-hidden="true">02</span>
-            <span class="start-item-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M12 3a7 7 0 0 0-7 7v4a7 7 0 0 0 14 0v-4a7 7 0 0 0-7-7Zm0 0v7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </span>
-            <span class="start-item-copy">
-              <span class="start-item-title"><span data-i18n="intro.mouse">Main dengan Mouse</span></span>
-              <span class="start-item-desc" data-i18n="start.mouse.desc">Main tanpa kamera, cukup gerakkan kursor di panggung.</span>
-            </span>
-            <svg class="start-item-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
-
-          <div class="start-divider" aria-hidden="true"><span data-i18n="start.explore">Jelajahi</span></div>
-
-          <button id="start-quiz" class="start-item" type="button">
-            <span class="start-index" aria-hidden="true">03</span>
-            <span class="start-item-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9.6 9.2a2.6 2.6 0 1 1 3.6 2.4c-.8.4-1.2 1-1.2 1.9M12 17h.01" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-            </span>
-            <span class="start-item-copy">
-              <span class="start-item-title" data-i18n="menu.quiz.title">Kuis Tokoh Wayang</span>
-              <span class="start-item-desc" data-i18n="start.quiz.desc">Uji pengetahuanmu tentang tokoh wayang.</span>
-            </span>
-            <svg class="start-item-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
-
-          <button id="start-stories" class="start-item" type="button">
-            <span class="start-index" aria-hidden="true">04</span>
-            <span class="start-item-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M12 6.5C10.4 5.2 8.4 4.5 6 4.5H3v13h3c2.4 0 4.4.7 6 2 1.6-1.3 3.6-2 6-2h3v-13h-3c-2.4 0-4.4.7-6 2Zm0 0v13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-            </span>
-            <span class="start-item-copy">
-              <span class="start-item-title" data-i18n="menu.stories.title">Cerita Wayang</span>
-              <span class="start-item-desc" data-i18n="start.stories.desc">Tonton kisah wayang dengan narasi dan subtitle tersinkron.</span>
-            </span>
-            <svg class="start-item-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
-        </nav>
-
-        <div class="start-footer">
-          <button id="start-settings" class="start-link" type="button">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19.4 13a7.6 7.6 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.3 7.3 0 0 0-1.7-1L15 3h-4l-.4 2.7a7.3 7.3 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.6 7.6 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a7.3 7.3 0 0 0 1.7 1L11 21h4l.4-2.7a7.3 7.3 0 0 0 1.7-1l2.5 1 2-3.5ZM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Z" transform="translate(-1 0)"/></svg>
-            <span data-i18n="settings.heading">Pengaturan</span>
-          </button>
-          <button id="start-help-toggle" class="start-link" type="button" aria-expanded="false" aria-controls="start-help">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9.6 9.2a2.6 2.6 0 1 1 3.6 2.4c-.8.4-1.2 1-1.2 1.9M12 17h.01" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-            <span id="start-help-label" data-i18n="start.help">Cara bermain</span>
-          </button>
-        </div>
-
-        <div id="start-help" class="start-help" hidden>
-          <p class="howto-heading" data-i18n="intro.howto">Cara bermain</p>
-          <ul class="howto">
-            <li>
-              <span class="step-number" aria-hidden="true">01</span>
-              <span class="step-copy"><span class="k" data-i18n="intro.step.move">Gerakkan wayang</span><span class="howto-detail" data-i18n="intro.step.move.detail">Setiap tangan mengendalikan satu wayang. Gerakkan telapak untuk menggerakkan badan; miringkan untuk condong.</span></span>
-            </li>
-            <li>
-              <span class="step-number" aria-hidden="true">02</span>
-              <span class="step-copy"><span class="k" data-i18n="intro.step.arms">Gerakkan lengan</span><span class="howto-detail" data-i18n="intro.step.arms.detail">Gunakan ibu jari dan telunjuk untuk menggerakkan tongkat lengan.</span></span>
-            </li>
-            <li>
-              <span class="step-number" aria-hidden="true">03</span>
-              <span class="step-copy"><span class="k" data-i18n="intro.step.dance">Ajak menari</span><span class="howto-detail" data-i18n="intro.step.dance.detail">Angkat kelingking untuk kiprahan. Dekatkan tangan ke kamera agar bayangan membesar.</span></span>
-            </li>
-          </ul>
-        </div>
-
-        <p class="start-hint" data-i18n="start.hint">Gunakan ↑ ↓ lalu Enter, atau klik menu.</p>
-        <p id="intro-status" class="status-line" role="status"></p>
       </div>
     </section>
 
-    <div id="stage-tools" class="stage-tools-wrap" role="group" aria-label="Kontrol panggung" data-i18n-aria-label="stage.tools">
-      <div class="stage-tools">
+    <div id="stage-tools" class="stage-tools-wrap" role="toolbar" aria-orientation="horizontal" aria-label="Kontrol panggung" data-i18n-aria-label="stage.tools" aria-controls="stage" focusgroup="toolbar wrap">
+      <div class="stage-tools" role="group" aria-label="Aksi panggung" data-i18n-aria-label="stage.actions">
         <button id="stage-screenshot" class="stage-tool" type="button" aria-label="Tangkapan layar" title="Tangkapan layar (S)" data-i18n-aria-label="stage.screenshot" data-i18n-title="stage.screenshot.title">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3l1.5-2h7L17 7h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1Zm8 9a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
         </button>
@@ -173,7 +193,7 @@
     <button id="home-toggle" class="icon-btn" type="button" aria-label="Kembali ke menu utama" title="Kembali ke menu utama" data-i18n-aria-label="nav.home" data-i18n-title="nav.home">
       <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="m3 10 9-7 9 7M5.5 9v11h13V9M9 20v-7h6v7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
-    <button id="settings-toggle" class="icon-btn" aria-label="Settings" aria-expanded="false" data-i18n-aria-label="nav.settings">
+    <button id="settings-toggle" class="icon-btn" aria-label="Settings" aria-expanded="false" aria-controls="settings" data-i18n-aria-label="nav.settings">
       <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M19.4 13a7.6 7.6 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.3 7.3 0 0 0-1.7-1L15 3h-4l-.4 2.7a7.3 7.3 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.6 7.6 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a7.3 7.3 0 0 0 1.7 1L11 21h4l.4-2.7a7.3 7.3 0 0 0 1.7-1l2.5 1 2-3.5ZM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Z" transform="translate(-1 0)"/></svg>
     </button>
 
@@ -199,54 +219,126 @@
         </span>
         <svg class="menu-item-arrow" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="m9 18 6-6-6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
+      <button id="open-character-gallery" class="menu-item" type="button">
+        <span class="menu-item-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5v-15Zm0 12A2.5 2.5 0 0 1 6.5 15H20M8 7h8M8 10h5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span class="menu-item-copy">
+          <span class="menu-item-title" data-i18n="gallery.open">Galeri tokoh</span>
+          <span class="menu-item-description" data-i18n="gallery.open-description">Kenali 13 tokoh wayang.</span>
+        </span>
+        <svg class="menu-item-arrow" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="m9 18 6-6-6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button id="open-gesture-practice" class="menu-item" type="button">
+        <span class="menu-item-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20"><path d="M8 11V5a1.5 1.5 0 0 1 3 0v5-7a1.5 1.5 0 0 1 3 0v7-5a1.5 1.5 0 0 1 3 0v6-3a1.5 1.5 0 0 1 3 0v6c0 4-2.5 7-6.5 7h-1c-2.3 0-3.7-1-5-2.7l-3-4A1.7 1.7 0 0 1 7.2 12L8 13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span class="menu-item-copy">
+          <span class="menu-item-title" data-i18n="practice.open">Latihan gestur</span>
+          <span class="menu-item-description" data-i18n="practice.open-description">Coba gerakan kamera atau mouse.</span>
+        </span>
+        <svg class="menu-item-arrow" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="m9 18 6-6-6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
     </nav>
 
-    <aside id="settings" class="panel settings" hidden>
-      <h2 data-i18n="settings.heading">Settings</h2>
-      <label><span data-i18n="settings.puppets">Puppets</span>
-        <select id="opt-characters">
-          <option value="two" data-i18n="settings.puppets.two">Two puppets, one per hand</option>
-          <option value="one" data-i18n="settings.puppets.one">One puppet</option>
-        </select>
-      </label>
-      <label><span data-i18n="settings.left">Left puppet</span>
-        <select id="opt-char-left"></select>
-      </label>
-      <label id="char-right-row"><span data-i18n="settings.right">Right puppet</span>
-        <select id="opt-char-right"></select>
-      </label>
-      <label><span data-i18n="settings.fingers">Arm-rod fingers</span>
-        <select id="opt-fingers">
-          <option value="thumb-index" data-i18n="settings.fingers.thumb-index">Thumb + index</option>
-          <option value="thumb-pinky" data-i18n="settings.fingers.thumb-pinky">Thumb + pinky (arms spread wider)</option>
-          <option value="index-pinky" data-i18n="settings.fingers.index-pinky">Index + pinky</option>
-        </select>
-      </label>
-      <label id="bodyhand-row" hidden><span data-i18n="settings.bodyhand">Body hand (one puppet, two hands)</span>
-        <select id="opt-bodyhand">
-          <option value="right" data-i18n="settings.bodyhand.right">Right hand holds the gapit</option>
-          <option value="left" data-i18n="settings.bodyhand.left">Left hand holds the gapit</option>
-        </select>
-      </label>
-      <label><span data-i18n="settings.facing">Facing</span>
-        <select id="opt-facing">
-          <option value="target" data-i18n="settings.facing.target">Face each other</option>
-          <option value="walk" data-i18n="settings.facing.walk">Face the way they walk</option>
-          <option value="manual" data-i18n="settings.facing.manual">Manual (F / G to turn)</option>
-        </select>
-      </label>
-      <label class="row"><input type="checkbox" id="opt-audience-view" /><span data-i18n="settings.audience">POV penonton: tampilkan bayangan saja</span></label>
-      <label><span data-i18n="settings.background">Background</span>
-        <select id="opt-background"></select>
-      </label>
-      <label><span data-i18n="settings.music">Music</span>
-        <select id="opt-music"></select>
-      </label>
-      <label class="row"><input type="checkbox" id="opt-camera" checked /><span data-i18n="settings.camera">Show camera preview</span></label>
-      <button id="opt-popout" class="btn small" type="button" data-i18n="settings.camera.open">Open camera in new window</button>
-      <label><span data-i18n="settings.size">Puppet size</span>
-        <input type="range" id="opt-size" min="0.36" max="0.72" step="0.01" value="0.53" />
-      </label>
+    <aside id="settings" class="panel settings" aria-labelledby="settings-title" hidden>
+      <header class="settings-header">
+        <div>
+          <h2 id="settings-title" data-i18n="settings.heading">Settings</h2>
+          <p data-i18n="settings.description">Atur tokoh dan suasana panggung.</p>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" aria-label="Tutup pengaturan" data-i18n-aria-label="settings.close">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </header>
+      <fieldset class="settings-group">
+        <legend data-i18n="settings.group.puppets">Tokoh &amp; kendali</legend>
+        <div class="settings-fields">
+          <label><span data-i18n="settings.puppets">Puppets</span>
+            <select id="opt-characters">
+              <option value="two" data-i18n="settings.puppets.two">Two puppets, one per hand</option>
+              <option value="one" data-i18n="settings.puppets.one">One puppet</option>
+            </select>
+          </label>
+          <label><span data-i18n="settings.left">Left puppet</span>
+            <select id="opt-char-left"></select>
+          </label>
+          <label id="char-right-row"><span data-i18n="settings.right">Right puppet</span>
+            <select id="opt-char-right"></select>
+          </label>
+          <label><span data-i18n="settings.fingers">Arm-rod fingers</span>
+            <select id="opt-fingers">
+              <option value="thumb-index" data-i18n="settings.fingers.thumb-index">Thumb + index</option>
+              <option value="thumb-pinky" data-i18n="settings.fingers.thumb-pinky">Thumb + pinky (arms spread wider)</option>
+              <option value="index-pinky" data-i18n="settings.fingers.index-pinky">Index + pinky</option>
+            </select>
+          </label>
+          <label id="bodyhand-row" hidden><span data-i18n="settings.bodyhand">Body hand (one puppet, two hands)</span>
+            <select id="opt-bodyhand">
+              <option value="right" data-i18n="settings.bodyhand.right">Right hand holds the gapit</option>
+              <option value="left" data-i18n="settings.bodyhand.left">Left hand holds the gapit</option>
+            </select>
+          </label>
+          <label><span data-i18n="settings.facing">Facing</span>
+            <select id="opt-facing">
+              <option value="target" data-i18n="settings.facing.target">Face each other</option>
+              <option value="walk" data-i18n="settings.facing.walk">Face the way they walk</option>
+              <option value="manual" data-i18n="settings.facing.manual">Manual (F / G to turn)</option>
+            </select>
+          </label>
+        </div>
+        <div id="puppet-previews" class="puppet-previews" role="group" aria-label="Pratinjau wayang terpilih" data-i18n-aria-label="settings.preview.label">
+          <figure id="left-puppet-preview" class="puppet-preview">
+            <img id="left-puppet-preview-image" alt="" />
+            <figcaption><span data-i18n="settings.left">Wayang kiri</span><strong id="left-puppet-preview-name"></strong></figcaption>
+          </figure>
+          <figure id="right-puppet-preview" class="puppet-preview">
+            <img id="right-puppet-preview-image" alt="" />
+            <figcaption><span data-i18n="settings.right">Wayang kanan</span><strong id="right-puppet-preview-name"></strong></figcaption>
+          </figure>
+        </div>
+      </fieldset>
+      <fieldset class="settings-group">
+        <legend data-i18n="settings.group.stage">Tampilan panggung</legend>
+        <div class="settings-fields">
+          <label><span data-i18n="settings.background">Background</span>
+            <select id="opt-background"></select>
+          </label>
+          <label class="settings-range"><span data-i18n="settings.size">Puppet size</span>
+            <input type="range" id="opt-size" min="0.36" max="0.72" step="0.01" value="0.53" />
+          </label>
+          <label class="row"><input type="checkbox" id="opt-audience-view" /><span data-i18n="settings.audience">POV penonton: tampilkan bayangan saja</span></label>
+        </div>
+      </fieldset>
+      <fieldset class="settings-group">
+        <legend data-i18n="settings.group.media">Suara &amp; kamera</legend>
+        <div class="settings-fields">
+          <label><span data-i18n="settings.music">Music</span>
+            <select id="opt-music"></select>
+          </label>
+          <label class="row"><input type="checkbox" id="opt-camera" checked /><span data-i18n="settings.camera">Show camera preview</span></label>
+          <button id="opt-popout" class="btn small settings-popout" type="button" data-i18n="settings.camera.open">Open camera in new window</button>
+        </div>
+      </fieldset>
+      <fieldset class="settings-group settings-subtitles">
+        <legend data-i18n="settings.group.subtitles">Subtitle</legend>
+        <div class="settings-fields">
+          <label class="settings-range">
+            <span data-i18n="settings.subtitle.size">Ukuran teks</span>
+            <span class="settings-range-row">
+              <input id="opt-subtitle-size" type="range" min="14" max="30" step="1" value="18" />
+              <output id="opt-subtitle-size-output" for="opt-subtitle-size">18 px</output>
+            </span>
+          </label>
+          <label class="settings-range">
+            <span data-i18n="settings.subtitle.background">Latar subtitle</span>
+            <span class="settings-range-row">
+              <input id="opt-subtitle-background" type="range" min="0" max="85" step="5" value="55" />
+              <output id="opt-subtitle-background-output" for="opt-subtitle-background">55%</output>
+            </span>
+          </label>
+        </div>
+      </fieldset>
     </aside>
 
     <div id="preview-box" role="group" aria-label="Pratinjau kamera. Seret atau gunakan tombol panah untuk memindahkannya." data-i18n-aria-label="preview.label" tabindex="0" hidden>
@@ -301,6 +393,51 @@
         <p class="story-voice-note" data-i18n="story.voice-note">Dialog Werkudara–Dewa Ruci menampilkan gestur menunjuk pada tokoh yang berbicara dan meminta akses kamera saat cerita dimulai.</p>
       </section>
     </div>
+
+    <dialog id="character-gallery-modal" class="panel quiz-dialog character-gallery-dialog" aria-labelledby="character-gallery-title" aria-describedby="gallery-description" closedby="any">
+        <header class="quiz-header">
+          <div>
+            <p class="eyebrow" data-i18n="gallery.eyebrow">Tokoh pewayangan</p>
+            <h2 id="character-gallery-title" data-i18n="gallery.title">Galeri tokoh wayang</h2>
+            <p id="gallery-description" class="gallery-intro" data-i18n="gallery.description">Kenali tokoh-tokoh yang hadir di panggung.</p>
+          </div>
+          <button id="character-gallery-close" class="quiz-close" type="button" aria-label="Tutup galeri" data-i18n-aria-label="gallery.close">×</button>
+        </header>
+        <div id="character-gallery-grid" class="character-gallery-grid" role="list" aria-label="13 tokoh wayang" data-i18n-aria-label="gallery.list-label"></div>
+    </dialog>
+
+    <dialog id="practice-modal" class="panel quiz-dialog practice-dialog" aria-labelledby="practice-title" aria-describedby="practice-description" closedby="any">
+        <header class="quiz-header">
+          <div>
+            <p class="eyebrow" data-i18n="practice.eyebrow">Latihan panggung</p>
+            <h2 id="practice-title" data-i18n="practice.title">Coba kendalikan wayang</h2>
+          </div>
+          <button id="practice-close" class="quiz-close" type="button" aria-label="Tutup latihan" data-i18n-aria-label="practice.close">×</button>
+        </header>
+        <p id="practice-description" class="practice-description" data-i18n="practice.description">Ikuti tiga latihan singkat. Pilih kamera untuk mencoba gestur tangan atau mouse tanpa meminta akses kamera.</p>
+        <ol class="practice-preview-steps">
+          <li data-i18n="practice.preview.move">Gerakkan telapak untuk memindahkan wayang.</li>
+          <li data-i18n="practice.preview.arms">Dekatkan ibu jari dan telunjuk untuk menggerakkan lengan.</li>
+          <li data-i18n="practice.preview.dance">Angkat kelingking untuk memulai kiprahan.</li>
+        </ol>
+        <div class="practice-actions">
+          <button id="practice-camera" class="btn primary" type="button" data-i18n="practice.camera">Latihan dengan kamera</button>
+          <button id="practice-mouse" class="btn" type="button" data-i18n="practice.mouse">Latihan dengan mouse</button>
+        </div>
+    </dialog>
+
+    <aside id="practice-coach" class="panel practice-coach" aria-labelledby="practice-coach-title" hidden>
+      <div class="practice-coach-top">
+        <p id="practice-step-count" class="practice-step-count" aria-live="polite"></p>
+        <button id="practice-exit" class="practice-exit" type="button" aria-label="Akhiri latihan" data-i18n-aria-label="practice.exit">×</button>
+      </div>
+      <h2 id="practice-coach-title" data-i18n="practice.title">Coba kendalikan wayang</h2>
+      <p id="practice-step-description" class="practice-step-description"></p>
+      <div class="practice-coach-actions">
+        <button id="practice-prev" class="btn small" type="button" data-i18n="practice.previous">Kembali</button>
+        <button id="practice-next" class="btn primary small" type="button" data-i18n="practice.next">Berikutnya</button>
+      </div>
+    </aside>
 
     <audio id="story-narration" preload="auto" hidden></audio>
     <section id="story-playback" class="story-playback" aria-label="Pemutaran cerita" data-i18n-aria-label="story.playback" hidden>

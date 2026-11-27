@@ -93,7 +93,7 @@ export const STORIES = [
             actor: 'petruk',
             speaker: 'Petruk',
             speakerEn: 'Petruk',
-            text: 'Waduh... Den Gatotkaca, sampun galak-galak ta, Den. Biasane nek ketemu Petruk nang Karang Kadempel ki ngajak ngopi, lha kok saiki nganggo nada kaya arep nagih utang? Aku iki saiki wis dadi raja, lho!',
+            text: 'Waduh... Den Gatotkaca, jangan galak-galak begitu. Biasanya kalau bertemu Petruk di Karang Kadempel, Den mengajak ngopi. Kok sekarang bicara dengan nada seperti mau menagih utang? Aku sekarang sudah jadi raja, lho!',
             textEn: 'Oh, Master Gatotkaca, don’t be so fierce. Usually, when you meet Petruk in Karang Kadempel, you invite me for coffee. Now you speak as if you are collecting a debt? I have become a king!',
           },
           {
@@ -111,7 +111,7 @@ export const STORIES = [
             actor: 'petruk',
             speaker: 'Petruk',
             speakerEn: 'Petruk',
-            text: 'Lho, kok malah gumun ta, Den? Nek wong cilik dadi raja ki pancen aneh ya? Coba takon karo awake dhewe... Saksuwene iki, sing paling akeh mbantu, ngurus, lan ngrungokake keluh kesah ki sapa? Ya wong-wong cilik kaya aku! Dadi nek saiki aku nyoba dadi raja, kudune ora usah kaget!',
+            text: 'Lho, kok malah heran, Den? Memangnya aneh kalau rakyat kecil menjadi raja? Coba tanya diri sendiri... Selama ini, siapa yang paling banyak membantu, mengurus, dan mendengarkan keluh kesah? Ya, rakyat kecil seperti aku! Jadi, kalau sekarang aku mencoba menjadi raja, Den tidak perlu kaget!',
             textEn: 'Why are you surprised, Master? Isn’t it strange when common people become rulers? Just ask yourself... all this time, who helps, manages, and listens to people’s troubles? Common people like me! So if I now try to become a ruler, you should not be surprised!',
           },
           {
@@ -129,7 +129,7 @@ export const STORIES = [
             actor: 'petruk',
             speaker: 'Petruk',
             speakerEn: 'Petruk',
-            text: 'Nah, ngono kuwi, Den! Dadi raja utawa dadi ksatria ki ora cukup mung gagah lan sekti mandraguna, nanging kudu gelem ngrungokake suarane wong cilik. Yen wis paham, ayo padha rembugan apik-apik—timbang adu otot, mending padha golek wedang jahe!',
+            text: 'Nah, begitu, Den! Menjadi raja atau kesatria tidak cukup hanya gagah dan sakti mandraguna, tetapi juga harus mau mendengarkan suara rakyat kecil. Kalau sudah paham, ayo kita bicara baik-baik—daripada adu otot, lebih baik mencari wedang jahe!',
             textEn: 'Exactly, Master! Being a king or a warrior is not enough to be brave and mighty; you must also be willing to listen to common people. If you understand, let us talk properly—rather than wrestling strength, let us find ginger drinks!',
           },
         ],

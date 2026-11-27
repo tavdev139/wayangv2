@@ -85,6 +85,7 @@ export class Controller {
     this.home = [[640, 650], [1280, 650]];
     this.pendingDance = [false, false];
     this.demoDance = -1;
+    this.demoPaused = false;
   }
 
   // keyboard / UI trigger for the signature dance
@@ -276,31 +277,52 @@ export class Controller {
   }
 
   demoInput(t, view) {
-    // attract loop: two characters meet, talk with their hands, back away, and pass each other
+    // Stage attract loop: two characters approach, guard, trade stylized sabetan, then reset.
     const cx = view.x + view.w / 2;
-    const drift = Math.sin(t * 0.13) * view.w * 0.08;
-    const gap = view.w * (0.36 + 0.14 * Math.sin(t * 0.42));
+    const drift = Math.sin(t * 0.13) * view.w * 0.04;
+    const beat = t % 16;
+    const pulse = (center, width) => {
+      const distance = Math.abs(((beat - center + 8) % 16) - 8);
+      const x = clamp(1 - distance / width, 0, 1);
+      return x * x * (3 - 2 * x);
+    };
+    const guard = Math.max(pulse(2.8, 1.6), pulse(7.4, 1.6));
+    const leftStrike = pulse(4.6, 0.82);
+    const rightStrike = pulse(9.2, 0.82);
+    const gap = view.w * (0.62 - guard * 0.035 + 0.025 * Math.sin(t * 0.42));
     const floor = view.y + view.h * 0.6;
-    const talk = (phase, amp) => ({
-      left: { type: 'rel', dx: -0.95 + Math.sin(t * 1.7 + phase) * 0.35 * amp, dy: -0.25 + Math.sin(t * 1.1 + phase) * 0.8 * amp },
-      right: { type: 'rel', dx: 0.55 + Math.sin(t * 1.3 + phase) * 0.3, dy: 0.45 + Math.sin(t * 0.9 + phase) * 0.55 },
+    const duelArms = (phase, strike, isGuarding) => ({
+      left: {
+        type: 'rel',
+        dx: -0.72 + Math.sin(t * 1.7 + phase) * 0.12,
+        dy: -0.45 - isGuarding * 0.25 - strike * 0.16,
+      },
+      right: {
+        type: 'rel',
+        dx: 0.58 + strike * 0.48 + Math.sin(t * 1.3 + phase) * 0.12,
+        dy: -0.24 - isGuarding * 0.22 - strike * 0.5 + Math.sin(t * 0.9 + phase) * 0.08,
+      },
     });
-    // take turns "speaking" (the speaker gestures bigger)
-    const turn = Math.sin(t * 0.5);
     const inputs = [
       {
         active: true,
-        body: { x: cx + drift - gap / 2, y: floor + Math.sin(t * 0.9) * 18 },
-        tilt: Math.sin(t * 0.55) * 0.06,
-        depth: Math.max(0, Math.sin(t * 0.21 - 1.2)) * 0.6,
-        arms: mirrorArms(talk(0, turn > 0 ? 1 : 0.35)),
+        body: {
+          x: cx + drift - gap / 2 + leftStrike * view.w * 0.045 - rightStrike * view.w * 0.018,
+          y: floor + Math.sin(t * 0.9) * 12 - leftStrike * 22,
+        },
+        tilt: Math.sin(t * 0.55) * 0.035 + leftStrike * 0.16 - rightStrike * 0.04,
+        depth: Math.max(0, Math.sin(t * 0.21 - 1.2)) * 0.42 + leftStrike * 0.12,
+        arms: mirrorArms(duelArms(0, leftStrike, guard)),
       },
       {
         active: true,
-        body: { x: cx + drift + gap / 2, y: floor + Math.sin(t * 0.8 + 2) * 18 },
-        tilt: Math.sin(t * 0.47 + 1) * 0.06,
-        depth: Math.max(0, Math.sin(t * 0.19 + 1.5)) * 0.6,
-        arms: talk(2, turn < 0 ? 1 : 0.35),
+        body: {
+          x: cx + drift + gap / 2 - rightStrike * view.w * 0.045 + leftStrike * view.w * 0.018,
+          y: floor + Math.sin(t * 0.8 + 2) * 12 - rightStrike * 22,
+        },
+        tilt: Math.sin(t * 0.47 + 1) * 0.035 - rightStrike * 0.16 + leftStrike * 0.04,
+        depth: Math.max(0, Math.sin(t * 0.19 + 1.5)) * 0.42 + rightStrike * 0.12,
+        arms: duelArms(2, rightStrike, guard),
       },
     ];
     // show off the signature dance now and then, taking turns

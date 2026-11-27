@@ -530,6 +530,60 @@ function finalize(c) {
 
 export const CHARACTERS = Object.fromEntries(RAW.map((c) => [c.id, finalize(c)]));
 export const CHARACTER_LIST = Object.values(CHARACTERS);
+export const CHARACTER_LORE = {
+  arjuna: {
+    id: 'Tokoh Pandawa yang dikenal sebagai pemanah ulung dan ksatria yang tenang.',
+    en: 'A Pandawa hero known as a master archer and a calm warrior.',
+  },
+  'wayang-baru': {
+    id: 'Hanoman adalah kera putih sakti yang membantu Rama dalam kisah Ramayana.',
+    en: 'Hanoman is a powerful white monkey who helps Rama in the Ramayana.',
+  },
+  'wayang-emas': {
+    id: 'Putra Bima yang dikenal sakti, gagah, dan mampu terbang.',
+    en: 'The son of Bima, known for his strength, courage, and ability to fly.',
+  },
+  werkudara: {
+    id: 'Salah satu Pandawa yang bertubuh kuat, berani, dan berbicara terus terang.',
+    en: 'One of the Pandawa, known for his strength, courage, and direct speech.',
+  },
+  yudistira: {
+    id: 'Pandawa tertua yang dikenal menjunjung kejujuran dan keadilan.',
+    en: 'The eldest Pandawa, known for upholding honesty and justice.',
+  },
+  rahwana: {
+    id: 'Raja Alengka dalam kisah Ramayana yang membawa Dewi Sinta ke kerajaannya.',
+    en: 'The king of Alengka in the Ramayana who takes Dewi Sinta to his kingdom.',
+  },
+  'dewi-sinta': {
+    id: 'Tokoh utama Ramayana, istri Rama yang dikenal teguh menghadapi cobaan.',
+    en: 'A central Ramayana character, Rama’s wife, known for her strength through hardship.',
+  },
+  semar: {
+    id: 'Punakawan bijaksana yang menjadi pengasuh dan penasihat para ksatria.',
+    en: 'A wise Punakawan who guides and advises the warriors.',
+  },
+  petruk: {
+    id: 'Punakawan jenaka yang menyampaikan kritik melalui humor dan pernah tampil sebagai Prabu Welgeduwelbeh.',
+    en: 'A witty Punakawan who uses humor to offer criticism and appears as Prabu Welgeduwelbeh.',
+  },
+  'dewa-ruci': {
+    id: 'Sosok yang ditemui Werkudara dalam pencariannya akan pengetahuan dan jati diri.',
+    en: 'A figure encountered by Werkudara on his quest for knowledge and self-understanding.',
+  },
+  drona: {
+    id: 'Guru para Pandawa dan Kurawa yang mengajarkan ilmu keprajuritan.',
+    en: 'The teacher of the Pandawa and Kurawa, who teaches the art of warfare.',
+  },
+  rama: {
+    id: 'Pangeran Ayodhya dalam Ramayana yang berjuang untuk menemukan Dewi Sinta.',
+    en: 'The prince of Ayodhya in the Ramayana who sets out to find Dewi Sinta.',
+  },
+  bagong: {
+    id: 'Punakawan yang jenaka dan blak-blakan, sering menyuarakan pandangan rakyat.',
+    en: 'A humorous, outspoken Punakawan who often voices ordinary people’s views.',
+  },
+};
 export const DEFAULT_CHARACTER = 'arjuna';
 // who stands on the kelir at start: [left puppet, right puppet]; a name that isn't in CHARACTERS falls back to DEFAULT_CHARACTER
 export const DEFAULT_PAIR = ['arjuna', 'wayang-baru'];
