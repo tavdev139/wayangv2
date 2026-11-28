@@ -80,6 +80,16 @@
               </span>
               <svg class="start-option-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
+            <button id="start-physical-play" class="start-option" type="button">
+              <span class="start-option-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M12 3v4m-4 0h8M8 7v8l4 5 4-5V7M5 10l3 2m11-2-3 2M8 15l-3 2m11-2 3 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              <span class="start-option-copy">
+                <span class="start-option-title" data-i18n="physical.open">Bermain dengan Wayang Fisik</span>
+                <span class="start-option-desc" data-i18n="physical.open-description">Gunakan perangkat wayang fisik di panggung.</span>
+              </span>
+              <svg class="start-option-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
           </nav>
 
           <div class="start-highlights" aria-label="Fitur panggung" data-i18n-aria-label="start.feature.label">
@@ -198,10 +208,16 @@
     </button>
 
     <nav id="app-menu" class="panel app-menu" aria-label="Menu fitur" data-i18n-aria-label="menu.label" hidden>
-      <p class="menu-heading" data-i18n="menu.heading">Fitur</p>
+      <div class="menu-header">
+        <div class="menu-heading-row">
+          <p class="menu-heading" data-i18n="menu.heading">Fitur</p>
+          <span class="menu-count" aria-hidden="true">05</span>
+        </div>
+        <p class="menu-subheading" data-i18n="menu.subheading">Pilih aktivitas panggung</p>
+      </div>
       <button id="open-quiz" class="menu-item" type="button">
         <span class="menu-item-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" width="20" height="20"><path d="M5 4.5A2.5 2.5 0 0 1 7.5 2H20v17H7.5A2.5 2.5 0 0 0 5 21.5v-17ZM5 18a2.5 2.5 0 0 1 2.5-2.5H20M10 7h6M10 10h6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg viewBox="0 0 24 24" width="20" height="20"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9.6 9.2a2.6 2.6 0 1 1 3.6 2.4c-.8.4-1.2 1-1.2 1.9M12 17h.01" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
         </span>
         <span class="menu-item-copy">
           <span class="menu-item-title" data-i18n="menu.quiz.title">Quiz Tokoh Wayang</span>
@@ -221,7 +237,7 @@
       </button>
       <button id="open-character-gallery" class="menu-item" type="button">
         <span class="menu-item-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" width="20" height="20"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5v-15Zm0 12A2.5 2.5 0 0 1 6.5 15H20M8 7h8M8 10h5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg viewBox="0 0 24 24" width="20" height="20"><rect x="4" y="4" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="13" y="4" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="4" y="13" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="13" y="13" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
         </span>
         <span class="menu-item-copy">
           <span class="menu-item-title" data-i18n="gallery.open">Galeri tokoh</span>
@@ -236,6 +252,16 @@
         <span class="menu-item-copy">
           <span class="menu-item-title" data-i18n="practice.open">Latihan gestur</span>
           <span class="menu-item-description" data-i18n="practice.open-description">Coba gerakan kamera atau mouse.</span>
+        </span>
+        <svg class="menu-item-arrow" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="m9 18 6-6-6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button id="open-physical-play" class="menu-item" type="button">
+        <span class="menu-item-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 3v4m-4 0h8M8 7v8l4 5 4-5V7M5 10l3 2m11-2-3 2M8 15l-3 2m11-2 3 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span class="menu-item-copy">
+          <span class="menu-item-title" data-i18n="physical.open">Bermain dengan Wayang Fisik</span>
+          <span class="menu-item-description" data-i18n="physical.open-description">Gunakan perangkat wayang fisik di panggung.</span>
         </span>
         <svg class="menu-item-arrow" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="m9 18 6-6-6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
@@ -424,6 +450,33 @@
           <button id="practice-camera" class="btn primary" type="button" data-i18n="practice.camera">Latihan dengan kamera</button>
           <button id="practice-mouse" class="btn" type="button" data-i18n="practice.mouse">Latihan dengan mouse</button>
         </div>
+    </dialog>
+
+    <dialog id="physical-play-modal" class="panel quiz-dialog physical-play-dialog" aria-labelledby="physical-play-title" aria-describedby="physical-play-description" closedby="any">
+      <header class="quiz-header">
+        <div>
+          <p class="eyebrow" data-i18n="physical.eyebrow">Mode panggung</p>
+          <h2 id="physical-play-title" data-i18n="physical.title">Bermain dengan Wayang Fisik</h2>
+        </div>
+        <button id="physical-play-close" class="quiz-close" type="button" aria-label="Tutup tampilan wayang fisik" data-i18n-aria-label="physical.close">×</button>
+      </header>
+      <p id="physical-play-description" class="physical-play-description" data-i18n="physical.description">Mode ini disiapkan untuk memainkan panggung dengan perangkat wayang fisik.</p>
+      <section class="physical-device-card" aria-labelledby="physical-device-title">
+        <div class="physical-device-art" aria-hidden="true">
+          <svg viewBox="0 0 64 80"><path d="M32 5v14m-13 0h26M19 19v30l13 24 13-24V19M9 27l10 8m26-8 10 8M19 49l-10 9m36-9 10 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="32" cy="31" r="5" fill="currentColor"/><path d="M24 40h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <div class="physical-device-copy">
+          <h3 id="physical-device-title" data-i18n="physical.device-title">Perangkat kendali fisik</h3>
+          <p data-i18n="physical.device-description">Area ini akan menampilkan status dan petunjuk sambungan setelah kode perangkat ditambahkan.</p>
+        </div>
+      </section>
+      <p class="physical-device-status" role="status">
+        <span class="physical-status-dot" aria-hidden="true"></span>
+        <span data-i18n="physical.status">Integrasi perangkat belum tersedia</span>
+      </p>
+      <div class="physical-dialog-actions">
+        <button id="physical-play-dismiss" class="btn primary" type="button" data-i18n="physical.dismiss">Kembali ke menu</button>
+      </div>
     </dialog>
 
     <aside id="practice-coach" class="panel practice-coach" aria-labelledby="practice-coach-title" hidden>

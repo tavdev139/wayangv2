@@ -366,6 +366,7 @@ const storyModal = $('story-modal');
 const characterGalleryModal = $('character-gallery-modal');
 const characterGalleryGrid = $('character-gallery-grid');
 const practiceModal = $('practice-modal');
+const physicalPlayModal = $('physical-play-modal');
 const practiceCoach = $('practice-coach');
 const storyList = $('story-list');
 const storyPlayback = $('story-playback');
@@ -411,6 +412,7 @@ function showChromeForActivity() {
       !storyModal.hidden ||
       characterGalleryModal.open ||
       practiceModal.open ||
+      physicalPlayModal.open ||
       practiceState;
     if (!overlayOpen) document.body.classList.add('chrome-hidden');
   }, CHROME_HIDE_DELAY);
@@ -1133,6 +1135,13 @@ function openCharacterGallery() {
 function closeCharacterGallery() {
   if (characterGalleryModal.open) characterGalleryModal.close();
 }
+function openPhysicalPlay() {
+  physicalPlayModal.showModal();
+  $('physical-play-close').focus();
+}
+function closePhysicalPlay() {
+  if (physicalPlayModal.open) physicalPlayModal.close();
+}
 const practiceStepKeys = {
   camera: ['practice.camera.move', 'practice.camera.arms', 'practice.camera.dance'],
   mouse: ['practice.mouse.move', 'practice.mouse.depth', 'practice.mouse.actions'],
@@ -1193,12 +1202,16 @@ $('open-quiz').addEventListener('click', (event) => openQuiz(event.currentTarget
 $('open-stories').addEventListener('click', (event) => openStories(event.currentTarget));
 $('open-character-gallery').addEventListener('click', (event) => openCharacterGallery(event.currentTarget));
 $('open-gesture-practice').addEventListener('click', (event) => openGesturePractice(event.currentTarget));
+$('open-physical-play').addEventListener('click', openPhysicalPlay);
 $('start-quiz').addEventListener('click', (event) => openQuiz(event.currentTarget));
 $('start-stories').addEventListener('click', (event) => openStories(event.currentTarget));
 $('start-character-gallery').addEventListener('click', () => openCharacterGallery());
 $('start-gesture-practice').addEventListener('click', () => openGesturePractice());
+$('start-physical-play').addEventListener('click', openPhysicalPlay);
 $('story-close').addEventListener('click', closeStoryPicker);
 $('character-gallery-close').addEventListener('click', closeCharacterGallery);
+$('physical-play-close').addEventListener('click', closePhysicalPlay);
+$('physical-play-dismiss').addEventListener('click', closePhysicalPlay);
 $('practice-close').addEventListener('click', closePracticePicker);
 if (!('closedBy' in HTMLDialogElement.prototype)) {
   const isBackdropPoint = (event, dialog) => {
@@ -1206,7 +1219,7 @@ if (!('closedBy' in HTMLDialogElement.prototype)) {
     return event.clientX < rect.left || event.clientX > rect.right ||
       event.clientY < rect.top || event.clientY > rect.bottom;
   };
-  for (const dialog of [characterGalleryModal, practiceModal]) {
+  for (const dialog of [characterGalleryModal, practiceModal, physicalPlayModal]) {
     let pressedOutside = false;
     dialog.addEventListener('pointerdown', (event) => {
       pressedOutside = isBackdropPoint(event, dialog);
@@ -1396,6 +1409,7 @@ function syncSubtitleSettings() {
   $('opt-subtitle-background-output').textContent = `${opacity}%`;
   storyCaption.style.setProperty('--subtitle-size', `${size}px`);
   storyCaption.style.setProperty('--subtitle-background-opacity', String(opacity / 100));
+  storyCaption.dataset.subtitleBackground = opacity === 0 ? 'none' : 'visible';
 }
 syncSubtitleSettings();
 $('opt-camera').addEventListener('change', (e) => {
@@ -1667,7 +1681,7 @@ addEventListener('keydown', (e) => {
       setSoundMenuOpen(false, true);
       return;
     }
-    if (characterGalleryModal.open || practiceModal.open) return;
+    if (characterGalleryModal.open || practiceModal.open || physicalPlayModal.open) return;
     if (storyState) {
       stopStory();
       return;
@@ -1702,6 +1716,7 @@ addEventListener('keydown', (e) => {
     storyModal.hidden &&
     !characterGalleryModal.open &&
     !practiceModal.open &&
+    !physicalPlayModal.open &&
     !practiceState
   ) {
     const stageKey = e.key.toLowerCase();
@@ -1721,7 +1736,14 @@ addEventListener('keydown', (e) => {
       return;
     }
   }
-  if (!quizModal.hidden || !storyModal.hidden || characterGalleryModal.open || practiceModal.open || storyState) return;
+  if (
+    !quizModal.hidden ||
+    !storyModal.hidden ||
+    characterGalleryModal.open ||
+    practiceModal.open ||
+    physicalPlayModal.open ||
+    storyState
+  ) return;
   if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) return;
   const k = e.key.toLowerCase();
   if (k === 'f') turnPuppet(0);
